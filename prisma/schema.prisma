@@ -1,37 +1,61 @@
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  // provider = "postgresql"
+  // url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 generator client {
   provider = "prisma-client-js"
 }
 
-model Profile {
-  id     Int     @id @default(autoincrement())
-  bio    String?
-  user   User    @relation(fields: [userId], references: [id])
-  userId Int     @unique
+model User {
+  id             Int            @id @default(autoincrement())
+  userName       String         @unique @map(name: "user_name")
+  email          String         @unique
+  hashedPassword String
+  bio            String?
+  createdAt      DateTime       @default(now()) @map(name: "created_at")
+  updatedAt      DateTime       @updatedAt @map(name: "updated_at")
+  programs       Program[] // List of Users authored programs
+  workouts       Workout[] // List of unassociated Workouts
+  subscriptions  Subscription[]
 }
 
-model User {
-  id             Int       @id @default(autoincrement())
-  userName       String    @unique
-  hashedPassword String
-  createdAt      DateTime  @default(now()) @map(name: "created_at")
-  updatedAt      DateTime  @updatedAt @map(name: "updated_at")
-  profile        Profile?
-  programs       Program[]
+model Subscription {
+  id           Int     @id @default(autoincrement())
+  active       Boolean @default(false) // scribscriber is never intially using the program
+  program      Program @relation(fields: [programId], references: [id])
+  programId    Int
+  subscriber   User    @relation(fields: [subscriberId], references: [id])
+  subscriberId Int
+
 }
 
 model Program {
-  id          Int       @id @default(autoincrement())
-  programName String    @map(name: "program_name")
-  author      User      @relation(fields: [authorId], references: [id])
+  id          Int            @id @default(autoincrement())
+  program     String
+  published   Boolean        @default(false) // if this program is shareable
+  author      User           @relation(fields: [authorId], references: [id])
   authorId    Int
+  workouts    Workout[]
+  subscribers Subscription[]
 }
 
 model Workout {
-  id      Int       @id @default(autoincrement())
+  id        Int        @id @default(autoincrement())
+  program   Program?   @relation(fields: [programId], references: [id]) // Workout may or may not be a part of a program
+  programId Int?
+  author    User?      @relation(fields: [authorId], references: [id]) // if unassociated workout this should be populated
+  authorId  Int?
+  exercises Exercise[]
+}
 
+model Exercise {
+  id        Int     @id @default(autoincrement())
+  name      String
+  reps      Int
+  weight    Int
+  workout   Workout @relation(fields: [workoutId], references: [id]) // Each Exercise belongs to one workout
+  workoutId Int
 }
