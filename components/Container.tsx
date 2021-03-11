@@ -8,14 +8,16 @@ const Container: FunctionComponent = ({ children }: Props) => {
     return (
         <>
             <Head>
+                <meta
+                    name="viewport"
+                    content="minimum-scale=1, initial-scale=1, width=device-width"
+                />
                 <link
-                    href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css"
                     rel="stylesheet"
-                    integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl"
-                    crossOrigin="anonymous"
+                    href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
                 />
             </Head>
-            <div className="container">{children}</div>
+            {children}
         </>
     );
 };
