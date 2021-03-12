@@ -16,7 +16,7 @@ export default function useUser({
     redirectIfFound = false,
 }: UserHookParams) {
     const { data: user, error: userError, mutate: mutateUser } = useSWR(
-        "api/user",
+        "api/user/me",
         fetcher
     );
 

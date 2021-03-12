@@ -5,7 +5,7 @@ import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import Link from "@material-ui/core/Link";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import { useState } from "react";
+import React, { useState } from "react";
 
 import fetcher from "../../lib/fetcher";
 import useUser from "../../lib/hooks/useUser";
@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme: Theme) =>
     })
 );
 
-export default function Login() {
+export default function Register() {
     const classes = useStyles();
     const { mutateUser } = useUser({
         redirectTo: "/tracker",
@@ -36,30 +36,33 @@ export default function Login() {
     });
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [email, setEmail] = useState("");
+    const [bio, setBio] = useState("");
 
-    const submitLogin = async (e: React.SyntheticEvent) => {
+    const submitRegister = async (e: React.SyntheticEvent) => {
         e.preventDefault();
         try {
             await mutateUser(
-                fetcher("/api/user/login", {
+                fetcher("api/user/register", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({ username, password }),
+                    body: JSON.stringify({ username, email, bio, password }),
                 })
             );
         } catch (error) {
-            console.error("Login Page Error: ", error);
+            console.error("Register Page Error: ", error);
         }
     };
+
     return (
         <Container component="main" maxWidth="xs">
             <div className={classes.page}>
                 <Typography component="h1" variant="h5">
-                    Login
+                    Register
                 </Typography>
-                <form onSubmit={submitLogin} className={classes.form}>
+                <form onSubmit={submitRegister} className={classes.form}>
                     <TextField
                         variant="outlined"
                         margin="normal"
@@ -71,6 +74,31 @@ export default function Login() {
                         autoComplete="username"
                         autoFocus
                         onChange={(e) => setUsername(e.target.value)}
+                    />
+                    <TextField
+                        variant="outlined"
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="email"
+                        label="Email"
+                        name="email"
+                        autoComplete="email"
+                        autoFocus
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
+                    <TextField
+                        variant="outlined"
+                        margin="normal"
+                        fullWidth
+                        multiline
+                        rows={5}
+                        id="bio"
+                        label="Bio"
+                        name="bio"
+                        autoComplete="bio"
+                        autoFocus
+                        onChange={(e) => setBio(e.target.value)}
                     />
                     <TextField
                         variant="outlined"
@@ -92,17 +120,12 @@ export default function Login() {
                         color="primary"
                         className={classes.submit}
                     >
-                        Login
+                        Register
                     </Button>
                     <Grid container>
-                        <Grid item xs>
-                            <Link href="/forgot-password" variant="body2">
-                                Forgot Password?
-                            </Link>
-                        </Grid>
                         <Grid item>
-                            <Link href="/register" variant="body2">
-                                Don't have an account? Register
+                            <Link href="/login" variant="body2">
+                                Already have an account? Login
                             </Link>
                         </Grid>
                     </Grid>

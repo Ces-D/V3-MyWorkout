@@ -1,17 +1,17 @@
 import bcrypt from "bcrypt";
-import prisma from "../../lib/db";
-import withSession from "../../lib/session";
+import prisma from "../../../lib/db";
+import withSession from "../../../lib/session";
 
 export default withSession(async (req, res) => {
     try {
         const existingUser = await prisma.user.findUnique({
             where: {
-                userName: req.body?.userName,
+                userName: req.body.username,
             },
         });
         if (existingUser) {
             const passwordMatch = bcrypt.compare(
-                req.body?.password,
+                req.body.password,
                 existingUser.hashedPassword
             );
             if (passwordMatch) {
@@ -19,12 +19,13 @@ export default withSession(async (req, res) => {
                 const userId = existingUser.id;
                 req.session.set("user", userId);
                 await req.session.save();
-                res.status(200).json(existingUser);
+                res.status(200).json({ existingUser });
             }
             throw new Error("Password or Username incorrect");
         }
         throw new Error("User not found");
     } catch (error) {
+        console.error("Login Api Error: ", error);
         res.status(400).json({ error });
     }
 });

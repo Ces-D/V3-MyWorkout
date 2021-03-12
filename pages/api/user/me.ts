@@ -1,5 +1,5 @@
-import withSession from "../../lib/session";
-import prisma from "../../lib/db";
+import withSession from "../../../lib/session";
+import prisma from "../../../lib/db";
 
 export default withSession(async (req, res) => {
     try {
@@ -18,10 +18,14 @@ export default withSession(async (req, res) => {
                     bio: userResponse.bio || "",
                 };
                 res.status(200).json({ isLoggedIn: true, ...user });
+            } else {
+                throw "Problem finding User";
             }
-            throw new Error("Problem finding User");
+        } else {
+            throw "No Session";
         }
     } catch (error) {
-        res.status(400).json({ error });
+        console.error("With Session Error: ", error);
+        res.status(200).json({ error });
     }
 });
