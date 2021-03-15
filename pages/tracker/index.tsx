@@ -7,11 +7,7 @@ import { GetServerSideProps } from "next";
 import withSession from "../../lib/session";
 
 import prisma from "../../lib/db";
-
-type day = {
-    any: any;
-    error: any;
-};
+import { GetServerSidePropsContextWithSession } from "../../types";
 
 //TODO: https://medium.com/@binyamin/static-server-side-and-client-side-rendering-with-nextjs-d5e1c61b24bd
 
@@ -19,14 +15,12 @@ type day = {
 // TODO: write the ExerciseAccordion
 
 // TODO: write the Tracker display
-// TODO: write the Tracker request logic
 
 // Route: /tracker || /tracker?d=Date
 const useStyles = makeStyles((theme: Theme) => createStyles({}));
 
-export default function Tracker(day: day) {
+export default function Tracker({ day }: any) {
     const classes = useStyles();
-
     return (
         <>
             <Head>
@@ -36,6 +30,8 @@ export default function Tracker(day: day) {
                 <Typography component="h1" variant="h5">
                     Tracker
                 </Typography>
+
+                {JSON.stringify(day)}
                 {/* <TrackerSwitcher /> */}
                 {/* data.map=(ex) => <ExerciseAccordion ex = ex/> */}
             </Container>
@@ -44,35 +40,54 @@ export default function Tracker(day: day) {
 }
 
 export const getServerSideProps: GetServerSideProps = withSession(
-    async (req, res) => {
+    async ({ req, res }: GetServerSidePropsContextWithSession) => {
+        // TODO: Test the response
+        const user = req.session && req.session.get("user");
+        if (!user) {
+            res.setHeader("location", "/login");
+            res.statusCode = 302;
+            res.end();
+            return { props: {} };
+        }
+        // TODO: write the query search conditional requests {d: "tomorrow"} = req.query
         try {
-            const user = req.session.get("user");
-            if (!user) {
-                // check if user logged In
-                res.setHeader("location", "/login");
-                res.statusCode = 302;
-                res.end();
+            const activeSubscription = await prisma.subscription.findFirst({
+                where: {
+                    subscriberId: user,
+                    active: true,
+                },
+            });
+
+            let workout;
+
+            if (activeSubscription) {
+                // Get that days workout from the program
+                /**
+                 * Should return the workout where the programId is equal to the Users active program
+                 *  and the position is equal to the subscriptions active program position
+                 */
+                workout = prisma.workout.findFirst({
+                    where: {
+                        programId: activeSubscription.programId,
+                        programPosition: activeSubscription.workoutPosition,
+                    },
+                });
+            } else {
+                // Get that days workout
+                /**
+                 * Should return the workout where the date is todays date and author is user
+                 */
+                workout = prisma.workout.findFirst({
+                    where: {
+                        authorId: user,
+                        date: new Date().toISOString(),
+                    },
+                });
             }
-            // TODO: Get the query if there is one for the day else get todays
-            // or load the users workouts for two weeks and display as accordion on
-            // click they are sent to the workouts page
-            /**
-             * Call the workout on the client side aka api request
-             * Need: dynamic api route,
-             * Pro: cache the similar html
-             * Con: two requests
-             *
-             * or
-             *
-             * use ServerSideProps which would be a fixed cost
-             * which could later be cached by nginx *potentially
-             * DECIDED WE WILL DO SERVER SIDE RENDERING FOR THIS PORTION
-             */
-            const workout = prisma.workout.findFirst({});
-            // TODO: write logic for finding the days workout
+            return { props: { day: workout } };
         } catch (error) {
             console.error("Server Side Day Error: ", error);
+            return { props: { day: {} } };
         }
-        return { props: {} };
     }
 );

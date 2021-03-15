@@ -1,11 +1,16 @@
 import { Session } from "next-iron-session";
-import { NextApiRequest, NextApiResponse } from "next";
+
+import { NextApiRequest, GetServerSidePropsContext } from "next";
+import { IncomingMessage } from "node:http";
+import { NextApiRequestCookies } from "next/dist/next-server/server/api-utils";
 
 export interface NextApiRequestWithSession extends NextApiRequest {
     session: Session;
 }
-
-export type HandlerWithSession = (
-    req: NextApiRequestWithSession,
-    res: NextApiResponse
-) => Promise<any>;
+export interface GetServerSidePropsContextWithSession
+    extends GetServerSidePropsContext {
+    req: IncomingMessage & {
+        cookies: NextApiRequestCookies;
+        session: Session;
+    };
+}

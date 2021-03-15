@@ -23,13 +23,14 @@ model User {
 }
 
 model Subscription {
-  id           Int     @id @default(autoincrement())
-  active       Boolean @default(false) // scribscriber is never intially using the program
-  program      Program @relation(fields: [programId], references: [id])
-  programId    Int
-  subscriber   User    @relation(fields: [subscriberId], references: [id])
-  subscriberId Int
-
+  id              Int       @id @default(autoincrement())
+  active          Boolean   @default(false) // subscriber is never initially using the program // Becomes false again when all workouts done // or if the subscriber decides to quit
+  activeDate      DateTime? // only necessary if active
+  workoutPosition Int       @default(1) // Should increment when program workout done
+  program         Program   @relation(fields: [programId], references: [id])
+  programId       Int
+  subscriber      User      @relation(fields: [subscriberId], references: [id])
+  subscriberId    Int
 }
 
 model Program {
@@ -38,17 +39,21 @@ model Program {
   published   Boolean        @default(false) // if this program is shareable
   author      User           @relation(fields: [authorId], references: [id])
   authorId    Int
-  workouts    Workout[]
+  length      Int            @default(1) // Should be at least one workout in program
   subscribers Subscription[]
+  Workout     Workout[]
 }
 
 model Workout {
-  id        Int        @id @default(autoincrement())
-  program   Program?   @relation(fields: [programId], references: [id]) // Workout may or may not be a part of a program
-  programId Int?
-  author    User?      @relation(fields: [authorId], references: [id]) // if unassociated workout this should be populated
-  authorId  Int?
-  exercises Exercise[]
+  id              Int        @id @default(autoincrement())
+  program         Program?   @relation(fields: [programId], references: [id]) // Workout may or may not be a part of a program
+  programId       Int?
+  programPosition Int? // if associated to program then this should be populated 
+  done            Boolean    @default(false) // when worked out then it becomes true
+  author          User?      @relation(fields: [authorId], references: [id]) // if unassociated workout this should be populated
+  authorId        Int?
+  date            DateTime? // if unassociated workout the author populates else subscriber populates
+  exercises       Exercise[]
 }
 
 model Exercise {

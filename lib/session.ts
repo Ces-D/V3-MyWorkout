@@ -1,7 +1,6 @@
-import { withIronSession } from "next-iron-session";
-import { HandlerWithSession } from "../types";
+import { Handler, withIronSession } from "next-iron-session";
 
-export default function withSession(handler: HandlerWithSession) {
+export default function withSession(handler: Handler) {
     return withIronSession(handler, {
         password: process.env.SESSION_PASSWORD || "secret",
         cookieName: "ironCookie",
