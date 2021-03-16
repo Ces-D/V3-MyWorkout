@@ -4,7 +4,7 @@ import useSWR from "swr";
 
 import fetcher from "../fetcher";
 
-//TODO: https://swr.vercel.app/docs/mutation
+//https://swr.vercel.app/docs/mutation
 
 interface UserHookParams {
     redirectTo: string | undefined;

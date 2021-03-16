@@ -3,7 +3,9 @@ import { useEffect } from "react";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { AppProps } from "next/app";
 
-function MyApp({ Component, pageProps }: AppProps) {
+import Layout from "../components/Layout";
+
+export default function MyApp({ Component, pageProps }: AppProps) {
     useEffect(() => {
         // Remove the server-side injected CSS.
         const jssStyles = document.querySelector("#jss-server-side");
@@ -13,12 +15,10 @@ function MyApp({ Component, pageProps }: AppProps) {
     }, []);
 
     return (
-        <>
+        <Layout>
             {/* <ThemeProvider theme={theme}></ThemeProvider> */}
             <CssBaseline />
             <Component {...pageProps} />
-        </>
+        </Layout>
     );
 }
-
-export default MyApp;

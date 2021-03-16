@@ -16,7 +16,7 @@ export default withSession(
             if (existingUser) {
                 throw new Error("User already exists");
             }
-            const encryptedPassword = bcrypt.genSaltSync(10, req.body.password);
+            const encryptedPassword = await bcrypt.hash(req.body.password, 10);
             const newUser = await prisma.user.create({
                 data: {
                     userName: req.body.username,

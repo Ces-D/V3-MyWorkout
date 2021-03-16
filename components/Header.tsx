@@ -1,45 +1,57 @@
 import React from "react";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import Link from "next/link";
+import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
-import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
-import MenuIcon from "@material-ui/icons/Menu";
+import Assignment from "@material-ui/icons/Assignment";
+import Toolbar from "@material-ui/core/Toolbar";
+
+import UserIconButton from "./UserIconButton";
+import useUser from "../lib/hooks/useUser";
+// TODO: place the icons on the right of bar
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
-        root: {
+        grow: {
             flexGrow: 1,
-        },
-        menuButton: {
-            marginRight: theme.spacing(2),
         },
         title: {
-            flexGrow: 1,
+            display: "none",
+            [theme.breakpoints.up("sm")]: {
+                display: "block",
+            },
+        },
+        section: {
+            display: "flex",
+            alignItems: "flex-end",
         },
     })
 );
 
 export default function Header() {
     const classes = useStyles();
-    // TODO: add conditional for Authentication Status
+    const { user } = useUser({ redirectTo: undefined, redirectIfFound: false });
+
     return (
-        <div className={classes.root}>
+        <div className={classes.grow}>
             <AppBar position="static">
                 <Toolbar>
-                    <IconButton
-                        edge="start"
-                        className={classes.menuButton}
-                        color="inherit"
-                        aria-label="menu"
-                    >
-                        <MenuIcon />
-                    </IconButton>
-                    <Typography variant="h6" className={classes.title}>
-                        News
+                    <Typography className={classes.title} variant="h6">
+                        Workout Tracker
                     </Typography>
-                    <Button color="inherit">Login</Button>
+                    {/* <div className={classes.grow}> */}
+                    <div className={classes.section}>
+                        {user?.isLoggedIn && (
+                            <IconButton color="inherit">
+                                <Link href="/tracker">
+                                    <Assignment />
+                                </Link>
+                            </IconButton>
+                        )}
+                        <UserIconButton />
+                    </div>
+                    {/* </div> */}
                 </Toolbar>
             </AppBar>
         </div>
