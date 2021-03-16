@@ -1,9 +1,7 @@
 import TextField from "@material-ui/core/TextField";
 import Container from "@material-ui/core/Container";
 import Typography from "@material-ui/core/Typography";
-import Button from "@material-ui/core/Button";
-import Grid from "@material-ui/core/Grid";
-import Link from "@material-ui/core/Link";
+]
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import React, { useState } from "react";
 
@@ -21,6 +19,11 @@ const useStyles = makeStyles((theme: Theme) =>
         form: {
             width: "100%",
             marginTop: theme.spacing(1),
+        },
+        date: {
+            marginLeft: theme.spacing(1),
+            marginRight: theme.spacing(1),
+            width: 200,
         },
     })
 );
@@ -45,7 +48,14 @@ export default function NewWorkout() {
                     Create New Workout
                 </Typography>
                 <form onSubmit={submitNewWorkout} className={classes.form}>
-                    {/* TODO: add the form fields */}
+                    <TextField
+                        id="date"
+                        label="Date"
+                        type="date"
+                        defaultValue={new Date()}
+                        className={classes.date}
+                        InputLabelProps={{ shrink: true }}
+                    />
                 </form>
             </div>
         </Container>
