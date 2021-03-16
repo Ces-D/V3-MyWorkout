@@ -1,9 +1,11 @@
+import React, { useState } from "react";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Container from "@material-ui/core/Container";
 import Typography from "@material-ui/core/Typography";
-]
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import React, { useState } from "react";
+import DateFnsUtils from "@date-io/date-fns";
+import MuiPickerUtilsProvider from "@material-ui/pickers/MuiPickersUtilsProvider";
+import { KeyboardDatePicker } from "@material-ui/pickers";
 
 import fetcher from "../../lib/fetcher";
 import useUser from "../../lib/hooks/useUser";
@@ -34,8 +36,8 @@ export default function NewWorkout() {
         redirectTo: "/login",
         redirectIfFound: false,
     });
-    const [date, setDate] = useState(new Date().toISOString());
-    const [exercises, setExercises] = useState([]);
+    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+    const [exercises, setExercises] = useState<Array<Object> | null>([]);
 
     const submitNewWorkout = async (e: React.SyntheticEvent) => {
         // TODO: complete the submit form logic
@@ -48,14 +50,14 @@ export default function NewWorkout() {
                     Create New Workout
                 </Typography>
                 <form onSubmit={submitNewWorkout} className={classes.form}>
-                    <TextField
-                        id="date"
-                        label="Date"
-                        type="date"
-                        defaultValue={new Date()}
-                        className={classes.date}
-                        InputLabelProps={{ shrink: true }}
-                    />
+                    <MuiPickerUtilsProvider utils={DateFnsUtils}>
+                        <KeyboardDatePicker
+                            value={selectedDate}
+                            minDate={new Date()}
+                            onChange={(date) => setSelectedDate(date)}
+                            format="dd/MM/yyyy"
+                        />
+                    </MuiPickerUtilsProvider>
                 </form>
             </div>
         </Container>
