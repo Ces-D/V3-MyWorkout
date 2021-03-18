@@ -1,15 +1,23 @@
-import React, { useState } from "react";
+import React, { createRef, useState } from "react";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import TextField from "@material-ui/core/TextField";
 import Container from "@material-ui/core/Container";
 import Typography from "@material-ui/core/Typography";
+import Grid from "@material-ui/core/Grid";
+import IconButton from "@material-ui/core/IconButton";
+import Add from "@material-ui/icons/Add";
+import Clear from "@material-ui/icons/Clear";
+
 import DateFnsUtils from "@date-io/date-fns";
 import MuiPickerUtilsProvider from "@material-ui/pickers/MuiPickersUtilsProvider";
 import { KeyboardDatePicker } from "@material-ui/pickers";
 
-import fetcher from "../../lib/fetcher";
-import useUser from "../../lib/hooks/useUser";
+import ExerciseInput from "../../components/forms/ExerciseInput";
 
+import useUser from "../../lib/hooks/useUser";
+import { ExerciseInputRefs } from "../../types";
+import { randomBytes } from "node:crypto";
+
+// TODO: test and possibly clean a little
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         page: {
@@ -36,11 +44,42 @@ export default function NewWorkout() {
         redirectTo: "/login",
         redirectIfFound: false,
     });
-    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
-    const [exercises, setExercises] = useState<Array<Object> | null>([]);
+    const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+    const exerciseRefs: Array<ExerciseInputRefs> = [];
 
     const submitNewWorkout = async (e: React.SyntheticEvent) => {
         // TODO: complete the submit form logic
+    };
+
+    const handleExerciseAddButtonClick = async (e: React.SyntheticEvent) => {
+        /**
+         *  add a ref and id object to exerciseRefs
+         * changes to exerciseRefs should add a new ExerciseInput Component
+         * placing the ref into the ref param and id into the id param
+         */
+        const id = randomBytes(10);
+        const ref = createRef();
+        exerciseRefs.push({
+            exerciseInputRef: ref,
+            refId: id.toString(),
+        });
+    };
+    const handleExerciseClearButtonClick = (e: React.SyntheticEvent) => {
+        console.log("Clear");
+    };
+
+    const handleExerciseDelete = (id: String) => {
+        /**
+         * remove a ref and id object from exerciseRefs Array
+         */
+        try {
+            exerciseRefs.filter((obj) => {
+                return obj.refId !== id;
+            });
+            return;
+        } catch (error) {
+            console.error("Problem Deleting an Exercise Input");
+        }
     };
 
     return (
@@ -54,10 +93,32 @@ export default function NewWorkout() {
                         <KeyboardDatePicker
                             value={selectedDate}
                             minDate={new Date()}
-                            onChange={(date) => setSelectedDate(date)}
+                            onChange={(newDate) => setSelectedDate(newDate)}
                             format="dd/MM/yyyy"
                         />
                     </MuiPickerUtilsProvider>
+                    <Grid>
+                        <IconButton
+                            color="inherit"
+                            onClick={handleExerciseAddButtonClick}
+                        >
+                            <Add />
+                        </IconButton>
+                        <IconButton
+                            color="inherit"
+                            onClick={handleExerciseClearButtonClick}
+                        >
+                            <Clear />
+                        </IconButton>
+                    </Grid>
+
+                    {exerciseRefs.map((exerciseRefObj) => (
+                        <ExerciseInput
+                            exerciseInputRef={exerciseRefObj.exerciseInputRef}
+                            refId={exerciseRefObj.refId}
+                            deleteRef={handleExerciseDelete}
+                        />
+                    ))}
                 </form>
             </div>
         </Container>
