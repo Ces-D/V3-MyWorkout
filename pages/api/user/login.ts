@@ -1,29 +1,24 @@
 import bcrypt from "bcrypt";
 import { NextApiResponse } from "next";
 
-import prisma from "../../../lib/db";
+import { findUser } from "../../../lib/queries";
 import withSession from "../../../lib/session";
 import { NextApiRequestWithSession } from "../../../types";
 
 export default withSession(
     async (req: NextApiRequestWithSession, res: NextApiResponse) => {
         try {
-            const existingUser = await prisma.user.findUnique({
-                where: {
-                    userName: req.body.username,
-                },
-            });
-            if (existingUser) {
+            const userFound = await findUser({ userName: req.body.username });
+            if (userFound) {
                 const passwordMatch = bcrypt.compare(
                     req.body.password,
-                    existingUser.hashedPassword
+                    userFound.hashedPassword
                 );
                 if (passwordMatch) {
                     // return users id in a cookie
-                    const userId = existingUser.id;
-                    req.session.set("user", userId);
+                    req.session.set("user", userFound.id);
                     await req.session.save();
-                    res.status(200).json({ existingUser });
+                    res.status(200).json({ userFound });
                 }
                 throw new Error("Password or Username incorrect");
             }

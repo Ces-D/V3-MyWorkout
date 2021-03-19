@@ -1,32 +1,27 @@
 import bcrypt from "bcrypt";
 import { NextApiResponse } from "next";
 
-import prisma from "../../../lib/db";
+import { registerNewUser, findUser } from "../../../lib/queries";
 import withSession from "../../../lib/session";
 import { NextApiRequestWithSession } from "../../../types";
 
 export default withSession(
     async (req: NextApiRequestWithSession, res: NextApiResponse) => {
         try {
-            const existingUser = await prisma.user.findUnique({
-                where: {
-                    userName: req.body.username,
-                },
+            const userFound = await findUser({
+                userName: req.body.username,
             });
-            if (existingUser) {
+            if (userFound) {
                 throw new Error("User already exists");
             }
             const encryptedPassword = await bcrypt.hash(req.body.password, 10);
-            const newUser = await prisma.user.create({
-                data: {
-                    userName: req.body.username,
-                    email: req.body.email,
-                    hashedPassword: encryptedPassword,
-                    bio: req.body.bio || undefined,
-                },
-            });
-            const newUserId = newUser.id;
-            req.session.set("user", newUserId);
+            const newUser = await registerNewUser(
+                req.body.username,
+                req.body.email,
+                encryptedPassword,
+                req.body.bio
+            );
+            req.session.set("user", newUser.id);
             await req.session.save();
             res.status(200).json({ newUser });
         } catch (error) {

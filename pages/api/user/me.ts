@@ -1,7 +1,7 @@
 import { NextApiResponse } from "next";
 
+import { findUser } from "../../../lib/queries";
 import withSession from "../../../lib/session";
-import prisma from "../../../lib/db";
 import { NextApiRequestWithSession } from "../../../types";
 
 export default withSession(
@@ -9,10 +9,8 @@ export default withSession(
         try {
             const sessionUserId = req.session.get("user");
             if (sessionUserId) {
-                const userResponse = await prisma.user.findUnique({
-                    where: {
-                        id: sessionUserId,
-                    },
+                const userResponse = await findUser({
+                    id: sessionUserId,
                 });
                 if (userResponse) {
                     const user = {

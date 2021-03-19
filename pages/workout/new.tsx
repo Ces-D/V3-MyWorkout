@@ -48,7 +48,7 @@ export default function NewWorkout() {
     const submitNewWorkout = async (e: React.SyntheticEvent) => {
         e.preventDefault();
         try {
-            // Get just the current exercises
+            // Create Array containing only current exercises
             const exercises = exerciseRefs.filter((obj) => {
                 obj.exerciseInputRef.current;
             });
@@ -61,15 +61,17 @@ export default function NewWorkout() {
                     body: JSON.stringify({ selectedDate, exercises }),
                 })
             );
-        } catch (error) {}
+        } catch (error) {
+            console.error("error");
+        }
     };
 
-    const handleExerciseAddButtonClick = async () => {
-        /**
-         *  add a ref and id object to exerciseRefs
-         * changes to exerciseRefs should add a new ExerciseInput Component
-         * placing the ref into the ref param and id into the id param
-         */
+    /**
+     * Adds new exerciseRef Object to an Array so that dynamic exercise data can be added
+     * @param e Mouse click activating the function
+     */
+    const handleExerciseAddButtonClick = async (e: React.MouseEvent) => {
+        e.preventDefault();
         const id = randomBytes(10);
         const ref = createRef();
         exerciseRefs.push({
@@ -77,24 +79,27 @@ export default function NewWorkout() {
             refId: id.toString(),
         });
     };
-    const handleExerciseClearButtonClick = () => {
+
+    /**
+     * Resets all the ExerciseRefs to empty Array
+     * @param e Mouse Click
+     */
+    const handleExerciseClearButtonClick = (e: React.MouseEvent) => {
+        e.preventDefault();
         exerciseRefs = [];
     };
 
+    /**
+     * Looks through Ref Array by chosen refId and removes the object from the Array
+     * @param id the refId of an ExerciseInputRefObject
+     */
     const handleExerciseDelete = (id: String) => {
-        /** Remove a ref Object given the objects refId property
-         * @param {String} id is the refId
-         */
-        try {
-            const objectIndex = exerciseRefs
-                .map((obj) => {
-                    return obj.refId;
-                })
-                .indexOf(id);
-            exerciseRefs.splice(objectIndex, 1);
-        } catch (error) {
-            console.error("Problem Deleting an Exercise Input");
-        }
+        const objectIndex = exerciseRefs
+            .map((obj) => {
+                return obj.refId;
+            })
+            .indexOf(id);
+        exerciseRefs.splice(objectIndex, 1);
     };
 
     return (

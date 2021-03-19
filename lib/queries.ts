@@ -1,12 +1,12 @@
-import { ExerciseObject } from "../types";
+import { ExerciseObject, SearchUserQueryParams } from "../types";
 import prisma from "./db";
 
 /**
- * Create new workout if it is not going to be a part of a program
- * @param authorId : the session users Id
- * @param date : date the workout is meant to be held
- * @param exercises : an array containing the various exercises (name, reps, weight)
- * @returns : new workout instance
+ * Create new workout in db if it is not going to be a part of a program
+ * @param authorId the session users Id
+ * @param date date the workout is meant to be held
+ * @param exercises an array containing the various exercises (name, reps, weight)
+ * @returns new workout instance
  */
 export const createNewWorkout = async (
     authorId: number,
@@ -25,7 +25,72 @@ export const createNewWorkout = async (
         });
         return newWorkout;
     } catch (error) {
-        console.error("New Workout Body Query: ", error);
+        console.error("New Workout Query Error: ", error);
+        throw new Error(error);
+    }
+};
+
+/**
+ * Create new user in db
+ * @param userName the username
+ * @param email email of user
+ * @param hashedPassword encrypted password
+ * @param bio optional param @defaults to undefined
+ * @returns new user instance
+ */
+export const registerNewUser = async (
+    userName: string,
+    email: string,
+    hashedPassword: string,
+    bio?: string
+) => {
+    try {
+        const user = await prisma.user.create({
+            data: {
+                userName: userName,
+                email: email,
+                hashedPassword: hashedPassword,
+                bio: bio,
+            },
+        });
+        return user;
+    } catch (error) {
+        console.error("Register New User Query Error: ", error);
+        throw new Error(error);
+    }
+};
+
+/**
+ * Find user from db
+ * @param params Object containing either user id or username
+ * @returns the user instance
+ */
+export const findUser = async (params: SearchUserQueryParams) => {
+    try {
+        let user = undefined;
+
+        if (params.id && params.userName) {
+            throw new Error("Only one search param allowed");
+        } else if (!params.id && !params.userName) {
+            throw new Error("One search param required");
+        }
+
+        if (params.id) {
+            user = await prisma.user.findUnique({
+                where: {
+                    id: params.id,
+                },
+            });
+        } else {
+            user = await prisma.user.findUnique({
+                where: {
+                    userName: params.userName,
+                },
+            });
+        }
+        return user;
+    } catch (error) {
+        console.error("Find User Query Error: ", error);
         throw new Error(error);
     }
 };

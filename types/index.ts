@@ -35,3 +35,8 @@ export type ExerciseInputControllerProps = {
     addButtonClick: any;
     clearButtonClick: any;
 };
+
+export type SearchUserQueryParams = {
+    id?: number;
+    userName?: string;
+};
