@@ -1,7 +1,7 @@
 import { NextApiResponse } from "next";
 
 import withSession from "../../../lib/session";
-import prisma from "../../../lib/db";
+import { createNewWorkout } from "../../../lib/queries";
 import { NextApiRequestWithSession } from "../../../types";
 
 /**
@@ -12,18 +12,11 @@ export default withSession(
         try {
             const sessionUserId = req.session.get("user");
             if (sessionUserId) {
-                // TODO: exercises should be an array of objects || consider making req.body type
-                // TODO: test
-                const { date, exercises } = req.body;
-                const workout = await prisma.workout.create({
-                    data: {
-                        authorId: sessionUserId,
-                        date: date,
-                        exercises: {
-                            create: [...exercises],
-                        },
-                    },
-                });
+                const workout = await createNewWorkout(
+                    sessionUserId,
+                    req.body.date,
+                    req.body.exercises
+                );
                 res.status(200).json({ workout });
             } else {
                 throw "No Session";

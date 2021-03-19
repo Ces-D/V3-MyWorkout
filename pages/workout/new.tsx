@@ -2,22 +2,18 @@ import React, { createRef, useState } from "react";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Typography from "@material-ui/core/Typography";
-import Grid from "@material-ui/core/Grid";
-import IconButton from "@material-ui/core/IconButton";
-import Add from "@material-ui/icons/Add";
-import Clear from "@material-ui/icons/Clear";
-
 import DateFnsUtils from "@date-io/date-fns";
 import MuiPickerUtilsProvider from "@material-ui/pickers/MuiPickersUtilsProvider";
 import { KeyboardDatePicker } from "@material-ui/pickers";
 
+import fetcher from "../../lib/fetcher";
 import ExerciseInput from "../../components/forms/ExerciseInput";
-
+import ExerciseInputController from "../../components/forms/ExerciseInputController";
 import useUser from "../../lib/hooks/useUser";
-import { ExerciseInputRefs } from "../../types";
+import { ExerciseInputRefObject } from "../../types";
 import { randomBytes } from "node:crypto";
+import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date";
 
-// TODO: test and possibly clean a little
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         page: {
@@ -44,14 +40,31 @@ export default function NewWorkout() {
         redirectTo: "/login",
         redirectIfFound: false,
     });
-    const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-    const exerciseRefs: Array<ExerciseInputRefs> = [];
+    const [selectedDate, setSelectedDate] = useState<
+        Date | MaterialUiPickersDate
+    >(new Date());
+    let exerciseRefs: Array<ExerciseInputRefObject> = [];
 
     const submitNewWorkout = async (e: React.SyntheticEvent) => {
-        // TODO: complete the submit form logic
+        e.preventDefault();
+        try {
+            // Get just the current exercises
+            const exercises = exerciseRefs.filter((obj) => {
+                obj.exerciseInputRef.current;
+            });
+            await mutateUser(
+                fetcher("api/workout/new", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ selectedDate, exercises }),
+                })
+            );
+        } catch (error) {}
     };
 
-    const handleExerciseAddButtonClick = async (e: React.SyntheticEvent) => {
+    const handleExerciseAddButtonClick = async () => {
         /**
          *  add a ref and id object to exerciseRefs
          * changes to exerciseRefs should add a new ExerciseInput Component
@@ -64,19 +77,21 @@ export default function NewWorkout() {
             refId: id.toString(),
         });
     };
-    const handleExerciseClearButtonClick = (e: React.SyntheticEvent) => {
-        console.log("Clear");
+    const handleExerciseClearButtonClick = () => {
+        exerciseRefs = [];
     };
 
     const handleExerciseDelete = (id: String) => {
-        /**
-         * remove a ref and id object from exerciseRefs Array
+        /** Remove a ref Object given the objects refId property
+         * @param {String} id is the refId
          */
         try {
-            exerciseRefs.filter((obj) => {
-                return obj.refId !== id;
-            });
-            return;
+            const objectIndex = exerciseRefs
+                .map((obj) => {
+                    return obj.refId;
+                })
+                .indexOf(id);
+            exerciseRefs.splice(objectIndex, 1);
         } catch (error) {
             console.error("Problem Deleting an Exercise Input");
         }
@@ -97,20 +112,11 @@ export default function NewWorkout() {
                             format="dd/MM/yyyy"
                         />
                     </MuiPickerUtilsProvider>
-                    <Grid>
-                        <IconButton
-                            color="inherit"
-                            onClick={handleExerciseAddButtonClick}
-                        >
-                            <Add />
-                        </IconButton>
-                        <IconButton
-                            color="inherit"
-                            onClick={handleExerciseClearButtonClick}
-                        >
-                            <Clear />
-                        </IconButton>
-                    </Grid>
+
+                    <ExerciseInputController
+                        addButtonClick={handleExerciseAddButtonClick}
+                        clearButtonClick={handleExerciseClearButtonClick}
+                    />
 
                     {exerciseRefs.map((exerciseRefObj) => (
                         <ExerciseInput

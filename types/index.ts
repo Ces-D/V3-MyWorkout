@@ -16,17 +16,22 @@ export interface GetServerSidePropsContextWithSession
     };
 }
 
-export type ExerciseInputRefs = {
+export type ExerciseInputRefObject = {
     exerciseInputRef: MutableRefObject<any>;
     refId: String;
 };
 
-export type ExerciseInputProps = ExerciseInputRefs & {
+export type ExerciseInputProps = ExerciseInputRefObject & {
     deleteRef: any;
 };
 
 export interface ExerciseObject {
-    name: String;
-    reps: Number;
-    weight: Number;
+    name: string;
+    reps: number;
+    weight: number;
 }
+
+export type ExerciseInputControllerProps = {
+    addButtonClick: any;
+    clearButtonClick: any;
+};
