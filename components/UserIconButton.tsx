@@ -31,14 +31,13 @@ export default function UserIconButton() {
 
     const handleLogout = async (e: React.SyntheticEvent) => {
         e.preventDefault();
-        mutateUser(await fetcher("/api/logout", { method: "POST" }), false);
+        mutateUser(await fetcher("/api/user/logout", { method: "POST" }));
         router.push("/login");
     };
 
     const userMenu = (
         <Menu
             anchorEl={anchorElement}
-            anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
             id="primary-user-menu"
             keepMounted
             transformOrigin={{ vertical: "bottom", horizontal: "left" }}

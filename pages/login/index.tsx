@@ -111,3 +111,5 @@ export default function Login() {
         </Container>
     );
 }
+
+//TODO: handle errors without ending the program. Same goes for register and other ofrms

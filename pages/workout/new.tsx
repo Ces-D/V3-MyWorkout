@@ -11,7 +11,7 @@ import ExerciseInput from "../../components/forms/ExerciseInput";
 import ExerciseInputController from "../../components/forms/ExerciseInputController";
 import useUser from "../../lib/hooks/useUser";
 import { ExerciseInputRefObject } from "../../types";
-import { randomBytes } from "node:crypto";
+import { randomBytes } from "crypto";
 import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -135,3 +135,5 @@ export default function NewWorkout() {
         </Container>
     );
 }
+
+// TODO: MuiPickersUtilsProvider error or mixed name and direct file import

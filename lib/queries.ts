@@ -1,25 +1,33 @@
-import { ExerciseObject, SearchUserQueryParams } from "../types";
+import {
+    ExerciseObject,
+    FindWorkoutParams,
+    SearchUserQueryParams,
+} from "../types";
 import prisma from "./db";
 
 /**
  * Create new workout in db if it is not going to be a part of a program
- * @param authorId the session users Id
+ * @param userId the session users Id
  * @param date date the workout is meant to be held
  * @param exercises an array containing the various exercises (name, reps, weight)
  * @returns new workout instance
  */
 export const createNewWorkout = async (
-    authorId: number,
+    userId: number,
     date: Date,
     exercises: Array<ExerciseObject>
 ) => {
     try {
         const newWorkout = await prisma.workout.create({
             data: {
-                authorId: authorId,
-                date: date,
-                exercises: {
+                Exercise: {
                     create: [...exercises],
+                },
+                Tracker: {
+                    create: {
+                        userId: userId,
+                        dueDate: date,
+                    },
                 },
             },
         });
@@ -94,3 +102,27 @@ export const findUser = async (params: SearchUserQueryParams) => {
         throw new Error(error);
     }
 };
+
+/**
+ * Find a workout from db
+ * @param params Object containing due date and user id
+ * @returns the workout instance
+ */
+export const findWorkout = async (params: FindWorkoutParams) => {
+    try {
+        const workout = await prisma.tracker.findFirst({
+            where: {
+                userId: params.userId,
+                dueDate: params.date,
+            },
+            include: {
+                workout: true,
+            },
+        });
+        return workout;
+    } catch (error) {
+        console.error("Find Workout Query Error: ", error);
+        throw new Error(error);
+    }
+};
+

@@ -13,47 +13,37 @@ model User {
   id             Int            @id @default(autoincrement())
   userName       String         @unique @map(name: "user_name")
   email          String         @unique
-  hashedPassword String
-  bio            String?
+  hashedPassword String         @map(name: "hashed_password")
+  bio            String         @default("")
   createdAt      DateTime       @default(now()) @map(name: "created_at")
   updatedAt      DateTime       @updatedAt @map(name: "updated_at")
-  programs       Program[] // List of Users authored programs
-  workouts       Workout[] // List of unassociated Workouts
-  subscriptions  Subscription[]
-}
-
-model Subscription {
-  id              Int       @id @default(autoincrement())
-  active          Boolean   @default(false) // subscriber is never initially using the program // Becomes false again when all workouts done // or if the subscriber decides to quit
-  activeDate      DateTime? // only necessary if active
-  workoutPosition Int       @default(1) // Should increment when program workout done
-  program         Program   @relation(fields: [programId], references: [id])
-  programId       Int
-  subscriber      User      @relation(fields: [subscriberId], references: [id])
-  subscriberId    Int
+  Tracker        Tracker[] // Maps Users, workout date, and the due date
+  Program        Program[] // Maps Users to programs they have written
+  Subscription   Subscription[] // Maps Users, program activity, and program
+  Workout        Workout[] // Maps Users to the workouts they have written only if the workout doesnt belong to program
 }
 
 model Program {
-  id          Int            @id @default(autoincrement())
-  program     String
-  published   Boolean        @default(false) // if this program is shareable
-  author      User           @relation(fields: [authorId], references: [id])
-  authorId    Int
-  length      Int            @default(1) // Should be at least one workout in program
-  subscribers Subscription[]
-  Workout     Workout[]
+  id           Int            @id @default(autoincrement())
+  name         String
+  published    Boolean        @default(false)
+  startDate    DateTime       @map(name: "start_date") // Date the user starts the program
+  writer       User           @relation(fields: [writerId], references: [id])
+  writerId     Int
+  workout      Workout[] // Maps Program to the workouts that make it up
+  Subscription Subscription[] // Maps Users, program activity, and program
 }
 
 model Workout {
-  id              Int        @id @default(autoincrement())
-  program         Program?   @relation(fields: [programId], references: [id]) // Workout may or may not be a part of a program
-  programId       Int?
-  programPosition Int? // if associated to program then this should be populated 
-  done            Boolean    @default(false) // when worked out then it becomes true
-  author          User?      @relation(fields: [authorId], references: [id]) // if unassociated workout this should be populated
-  authorId        Int?
-  date            DateTime? // if unassociated workout the author populates else subscriber populates
-  exercises       Exercise[]
+  id           Int        @id @default(autoincrement())
+  done         Boolean    @default(false)
+  program      Program?   @relation(fields: [programId], references: [id])
+  programId    Int? // Optional: if the workout belongs to a program
+  programOrder Int?       @map(name: "program_order") // If part of Program, where does this workout place 
+  writer       User?      @relation(fields: [writerId], references: [id])
+  writerId     Int? // Optional: if the workout does NOT belong to a program
+  Tracker      Tracker[] // Maps Users, workout date, and the due date
+  Exercise     Exercise[] // Maps Workout to the exercises that make it up
 }
 
 model Exercise {
@@ -61,6 +51,24 @@ model Exercise {
   name      String
   reps      Int
   weight    Int
-  workout   Workout @relation(fields: [workoutId], references: [id]) // Each Exercise belongs to one workout
+  workout   Workout @relation(fields: [workoutId], references: [id])
+  workoutId Int
+}
+
+model Subscription {
+  id           Int     @id @default(autoincrement())
+  active       Boolean @default(false)
+  program      Program @relation(fields: [programId], references: [id])
+  programId    Int
+  subscriber   User    @relation(fields: [subscriberId], references: [id])
+  subscriberId Int
+}
+
+model Tracker {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  dueDate   DateTime @default(now()) @map(name: "due_date")
+  workout   Workout  @relation(fields: [workoutId], references: [id])
   workoutId Int
 }

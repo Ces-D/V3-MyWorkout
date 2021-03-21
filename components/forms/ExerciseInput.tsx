@@ -51,7 +51,7 @@ export default function ExerciseInput(props: ExerciseInputProps) {
                     margin="normal"
                     required
                     fullWidth
-                    label="lbs"
+                    label="Weight (lbs)"
                     type="number"
                     autoFocus
                     onChange={(e) => setWeight(Number(e.target.value))}
