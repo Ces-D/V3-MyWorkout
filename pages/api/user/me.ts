@@ -7,7 +7,7 @@ import { NextApiRequestWithSession } from "../../../types";
 export default withSession(
     async (req: NextApiRequestWithSession, res: NextApiResponse) => {
         try {
-            const sessionUserId = req.session.get("user");
+            const sessionUserId = await req.session.get("user");
             if (sessionUserId) {
                 const userResponse = await findUser({
                     id: sessionUserId,

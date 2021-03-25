@@ -18,7 +18,7 @@ export interface GetServerSidePropsContextWithSession
 
 export type ExerciseInputRefObject = {
     exerciseInputRef: MutableRefObject<any>;
-    refId: String;
+    refId: string;
 };
 
 export type ExerciseInputProps = ExerciseInputRefObject & {

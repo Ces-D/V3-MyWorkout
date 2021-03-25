@@ -32,7 +32,6 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function Header() {
     const classes = useStyles();
     const { user } = useUser({ redirectTo: undefined, redirectIfFound: false });
-
     return (
         <div className={classes.grow}>
             <AppBar position="static">

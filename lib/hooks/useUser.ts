@@ -4,8 +4,6 @@ import useSWR from "swr";
 
 import fetcher from "../fetcher";
 
-//https://swr.vercel.app/docs/mutation
-
 interface UserHookParams {
     redirectTo: string | undefined;
     redirectIfFound: Boolean;
@@ -13,10 +11,10 @@ interface UserHookParams {
 
 export default function useUser({
     redirectTo,
-    redirectIfFound = false,
+    redirectIfFound,
 }: UserHookParams) {
-    const { data: user, error: userError, mutate: mutateUser } = useSWR(
-        "api/user/me",
+    const { data: user, error: userError, mutate: mutateUser } = useSWR<any>(
+        "/api/user/me",
         fetcher
     );
 

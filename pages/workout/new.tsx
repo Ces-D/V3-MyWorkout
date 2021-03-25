@@ -2,9 +2,12 @@ import React, { createRef, useState } from "react";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
 import DateFnsUtils from "@date-io/date-fns";
-import MuiPickerUtilsProvider from "@material-ui/pickers/MuiPickersUtilsProvider";
-import { KeyboardDatePicker } from "@material-ui/pickers";
+import {
+    KeyboardDatePicker,
+    MuiPickersUtilsProvider,
+} from "@material-ui/pickers";
 
 import fetcher from "../../lib/fetcher";
 import ExerciseInput from "../../components/forms/ExerciseInput";
@@ -31,6 +34,9 @@ const useStyles = makeStyles((theme: Theme) =>
             marginRight: theme.spacing(1),
             width: 200,
         },
+        submit: {
+            margin: theme.spacing(3, 0, 2),
+        },
     })
 );
 
@@ -43,7 +49,9 @@ export default function NewWorkout() {
     const [selectedDate, setSelectedDate] = useState<
         Date | MaterialUiPickersDate
     >(new Date());
-    let exerciseRefs: Array<ExerciseInputRefObject> = [];
+    const [exerciseRefs, setExerciseRefs] = useState<
+        Array<ExerciseInputRefObject>
+    >([]);
 
     const submitNewWorkout = async (e: React.SyntheticEvent) => {
         e.preventDefault();
@@ -62,7 +70,7 @@ export default function NewWorkout() {
                 })
             );
         } catch (error) {
-            console.error("error");
+            console.error("Submit New Workout Page Error", error);
         }
     };
 
@@ -72,12 +80,11 @@ export default function NewWorkout() {
      */
     const handleExerciseAddButtonClick = async (e: React.MouseEvent) => {
         e.preventDefault();
-        const id = randomBytes(10);
-        const ref = createRef();
-        exerciseRefs.push({
-            exerciseInputRef: ref,
-            refId: id.toString(),
-        });
+        const exerciseRef = {
+            exerciseInputRef: createRef(),
+            refId: randomBytes(10).toString(),
+        };
+        setExerciseRefs((exerciseRefs) => [...exerciseRefs, exerciseRef]);
     };
 
     /**
@@ -86,14 +93,14 @@ export default function NewWorkout() {
      */
     const handleExerciseClearButtonClick = (e: React.MouseEvent) => {
         e.preventDefault();
-        exerciseRefs = [];
+        setExerciseRefs([]);
     };
 
     /**
      * Looks through Ref Array by chosen refId and removes the object from the Array
      * @param id the refId of an ExerciseInputRefObject
      */
-    const handleExerciseDelete = (id: String) => {
+    const handleExerciseDelete = (id: string) => {
         const objectIndex = exerciseRefs
             .map((obj) => {
                 return obj.refId;
@@ -109,31 +116,46 @@ export default function NewWorkout() {
                     Create New Workout
                 </Typography>
                 <form onSubmit={submitNewWorkout} className={classes.form}>
-                    <MuiPickerUtilsProvider utils={DateFnsUtils}>
+                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
                         <KeyboardDatePicker
                             value={selectedDate}
                             minDate={new Date()}
                             onChange={(newDate) => setSelectedDate(newDate)}
                             format="dd/MM/yyyy"
                         />
-                    </MuiPickerUtilsProvider>
-
+                    </MuiPickersUtilsProvider>
                     <ExerciseInputController
                         addButtonClick={handleExerciseAddButtonClick}
                         clearButtonClick={handleExerciseClearButtonClick}
                     />
-
                     {exerciseRefs.map((exerciseRefObj) => (
                         <ExerciseInput
+                            key={exerciseRefObj.refId}
                             exerciseInputRef={exerciseRefObj.exerciseInputRef}
                             refId={exerciseRefObj.refId}
                             deleteRef={handleExerciseDelete}
                         />
                     ))}
+                    <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        color="primary"
+                        className={classes.submit}
+                    >
+                        Create
+                    </Button>{" "}
                 </form>
             </div>
         </Container>
     );
 }
 
-// TODO: MuiPickersUtilsProvider error or mixed name and direct file import
+/**
+ * [exerciseRefs, setExerciseRefs] = useState([])
+ * [exercises, setExercises] = useState()
+ * Add a useEffect that sets the exercises ()=> {
+ * async function  }
+ *
+ *
+ */

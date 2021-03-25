@@ -10,19 +10,20 @@ export default withSession(
         try {
             const userFound = await findUser({ userName: req.body.username });
             if (userFound) {
-                const passwordMatch = bcrypt.compare(
+                const passwordMatch = await bcrypt.compare(
                     req.body.password,
                     userFound.hashedPassword
                 );
                 if (passwordMatch) {
-                    // return users id in a cookie
                     req.session.set("user", userFound.id);
                     await req.session.save();
-                    res.status(200).json({ userFound });
+                    res.json({ userFound });
+                } else {
+                    throw "Password or Username incorrect";
                 }
-                throw new Error("Password or Username incorrect");
+            } else {
+                throw "User not found";
             }
-            throw new Error("User not found");
         } catch (error) {
             console.error("Login Api Error: ", error);
             res.status(400).json({ error });

@@ -112,4 +112,3 @@ export default function Login() {
     );
 }
 
-//TODO: handle errors without ending the program. Same goes for register and other ofrms
