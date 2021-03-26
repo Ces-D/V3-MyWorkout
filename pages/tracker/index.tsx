@@ -9,13 +9,6 @@ import withSession from "../../lib/session";
 import { findWorkout } from "../../lib/queries";
 import { GetServerSidePropsContextWithSession } from "../../types";
 
-//TODO: https://medium.com/@binyamin/static-server-side-and-client-side-rendering-with-nextjs-d5e1c61b24bd
-
-//TODO: write the TrackerSwitcher
-// TODO: write the ExerciseAccordion
-
-// TODO: write the Tracker display
-
 // Route: /tracker || /tracker?d=Date
 // const classes = makeStyles((theme: Theme) => createStyles({}));
 
@@ -48,11 +41,13 @@ export const getServerSideProps: GetServerSideProps = withSession(
         }
         //TODO:  req.query = {d: "12/21/21"}
         try {
-            const date = new Date();
+            const date = new Date()
+            console.log("Date: ", date);
             const workout = await findWorkout({
                 userId: user,
                 date: date,
             });
+            console.log("Workout: ", workout);
             return { props: { workout } };
         } catch (error) {
             console.error("Server Side Day Error: ", error);

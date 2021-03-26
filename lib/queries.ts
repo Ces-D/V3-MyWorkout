@@ -125,4 +125,3 @@ export const findWorkout = async (params: FindWorkoutParams) => {
         throw new Error(error);
     }
 };
-

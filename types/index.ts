@@ -1,4 +1,3 @@
-import { MutableRefObject } from "react";
 import { Session } from "next-iron-session";
 
 import { NextApiRequest, GetServerSidePropsContext } from "next";
@@ -15,25 +14,20 @@ export interface GetServerSidePropsContextWithSession
         session: Session;
     };
 }
-
-export type ExerciseInputRefObject = {
-    exerciseInputRef: MutableRefObject<any>;
-    refId: string;
+export type ExerciseInputProps = {
+    index: number;
+    nameInt: string;
+    repsInt: number;
+    weightInt: number;
+    handleInputChange: any;
+    handleRemoveClick: any;
+    handleAddClick: any;
+    displayAdd: Boolean;
 };
-
-export type ExerciseInputProps = ExerciseInputRefObject & {
-    deleteRef: any;
-};
-
-export interface ExerciseObject {
+export type ExerciseObject = {
     name: string;
     reps: number;
     weight: number;
-}
-
-export type ExerciseInputControllerProps = {
-    addButtonClick: any;
-    clearButtonClick: any;
 };
 
 export type SearchUserQueryParams = {

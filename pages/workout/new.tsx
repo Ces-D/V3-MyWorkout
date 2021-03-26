@@ -1,4 +1,4 @@
-import React, { createRef, useState } from "react";
+import React, { useState } from "react";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Typography from "@material-ui/core/Typography";
@@ -11,10 +11,8 @@ import {
 
 import fetcher from "../../lib/fetcher";
 import ExerciseInput from "../../components/forms/ExerciseInput";
-import ExerciseInputController from "../../components/forms/ExerciseInputController";
 import useUser from "../../lib/hooks/useUser";
-import { ExerciseInputRefObject } from "../../types";
-import { randomBytes } from "crypto";
+import { ExerciseObject } from "../../types";
 import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -42,71 +40,48 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function NewWorkout() {
     const classes = useStyles();
-    const { mutateUser } = useUser({
+    const { user } = useUser({
         redirectTo: "/login",
         redirectIfFound: false,
     });
-    const [selectedDate, setSelectedDate] = useState<
-        Date | MaterialUiPickersDate
-    >(new Date());
-    const [exerciseRefs, setExerciseRefs] = useState<
-        Array<ExerciseInputRefObject>
-    >([]);
+    const [date, setDate] = useState<Date>(new Date());
+
+    const [exercises, setExercises] = useState<Array<ExerciseObject>>([
+        { name: "", reps: 0, weight: 0 },
+    ]);
 
     const submitNewWorkout = async (e: React.SyntheticEvent) => {
         e.preventDefault();
         try {
-            // Create Array containing only current exercises
-            const exercises = exerciseRefs.filter((obj) => {
-                obj.exerciseInputRef.current;
+            await fetcher("/api/workout/new", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ date, exercises }),
             });
-            await mutateUser(
-                fetcher("api/workout/new", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ selectedDate, exercises }),
-                })
-            );
         } catch (error) {
-            console.error("Submit New Workout Page Error", error);
+            console.error("Submit New Workout Error: ", error);
         }
     };
 
-    /**
-     * Adds new exerciseRef Object to an Array so that dynamic exercise data can be added
-     * @param e Mouse click activating the function
-     */
-    const handleExerciseAddButtonClick = async (e: React.MouseEvent) => {
-        e.preventDefault();
-        const exerciseRef = {
-            exerciseInputRef: createRef(),
-            refId: randomBytes(10).toString(),
-        };
-        setExerciseRefs((exerciseRefs) => [...exerciseRefs, exerciseRef]);
+    const handleInputChange = async (
+        exerciseObject: ExerciseObject,
+        index: number
+    ) => {
+        const list = [...exercises];
+        list[index] = exerciseObject;
+        setExercises(list);
     };
 
-    /**
-     * Resets all the ExerciseRefs to empty Array
-     * @param e Mouse Click
-     */
-    const handleExerciseClearButtonClick = (e: React.MouseEvent) => {
-        e.preventDefault();
-        setExerciseRefs([]);
+    const handleRemoveClick = async (index: number) => {
+        const list = [...exercises];
+        list.splice(index, 1);
+        setExercises(list);
     };
 
-    /**
-     * Looks through Ref Array by chosen refId and removes the object from the Array
-     * @param id the refId of an ExerciseInputRefObject
-     */
-    const handleExerciseDelete = (id: string) => {
-        const objectIndex = exerciseRefs
-            .map((obj) => {
-                return obj.refId;
-            })
-            .indexOf(id);
-        exerciseRefs.splice(objectIndex, 1);
+    const handleAddClick = () => {
+        setExercises([...exercises, { name: "", reps: 0, weight: 0 }]);
     };
 
     return (
@@ -118,24 +93,29 @@ export default function NewWorkout() {
                 <form onSubmit={submitNewWorkout} className={classes.form}>
                     <MuiPickersUtilsProvider utils={DateFnsUtils}>
                         <KeyboardDatePicker
-                            value={selectedDate}
+                            value={date}
                             minDate={new Date()}
-                            onChange={(newDate) => setSelectedDate(newDate)}
+                            onChange={(newDate) =>
+                                setDate(new Date(newDate) || new Date())
+                            }
                             format="dd/MM/yyyy"
                         />
                     </MuiPickersUtilsProvider>
-                    <ExerciseInputController
-                        addButtonClick={handleExerciseAddButtonClick}
-                        clearButtonClick={handleExerciseClearButtonClick}
-                    />
-                    {exerciseRefs.map((exerciseRefObj) => (
-                        <ExerciseInput
-                            key={exerciseRefObj.refId}
-                            exerciseInputRef={exerciseRefObj.exerciseInputRef}
-                            refId={exerciseRefObj.refId}
-                            deleteRef={handleExerciseDelete}
-                        />
-                    ))}
+                    {exercises.map((x, i) => {
+                        return (
+                            <ExerciseInput
+                                key={i}
+                                index={i}
+                                nameInt={x.name}
+                                repsInt={x.reps}
+                                weightInt={x.weight}
+                                handleInputChange={handleInputChange}
+                                handleRemoveClick={handleRemoveClick}
+                                handleAddClick={handleAddClick}
+                                displayAdd={i === exercises.length - 1}
+                            />
+                        );
+                    })}
                     <Button
                         type="submit"
                         fullWidth
@@ -151,11 +131,5 @@ export default function NewWorkout() {
     );
 }
 
-/**
- * [exerciseRefs, setExerciseRefs] = useState([])
- * [exercises, setExercises] = useState()
- * Add a useEffect that sets the exercises ()=> {
- * async function  }
- *
- *
- */
+//TODO: Fix they prisma query. Why does it fail on the workout Date
+// TODO: Querying the tracker - workout does not return the exercise

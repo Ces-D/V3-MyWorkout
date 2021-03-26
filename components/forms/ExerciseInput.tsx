@@ -4,25 +4,22 @@ import TextField from "@material-ui/core/TextField";
 import IconButton from "@material-ui/core/IconButton";
 
 import Delete from "@material-ui/icons/Delete";
+import Add from "@material-ui/icons/Add";
 
 import { ExerciseInputProps } from "../../types";
 
 export default function ExerciseInput(props: ExerciseInputProps) {
-    const [name, setName] = useState<String>("");
-    const [reps, setReps] = useState<Number>(0);
-    const [weight, setWeight] = useState<Number>(0);
+    const [name, setName] = useState<string>(props.nameInt);
+    const [reps, setReps] = useState<number>(props.repsInt);
+    const [weight, setWeight] = useState<number>(props.weightInt);
 
     useEffect(() => {
-        props.exerciseInputRef.current = {
-            name: name,
-            reps: reps,
-            weight: weight,
-        };
+        props.handleInputChange({ name, reps, weight }, props.index);
     }, [name, reps, weight]);
 
     return (
         <Grid container spacing={3} alignItems="center">
-            <Grid item xs>
+            <Grid item sm>
                 <TextField
                     variant="outlined"
                     margin="normal"
@@ -57,13 +54,25 @@ export default function ExerciseInput(props: ExerciseInputProps) {
                     onChange={(e) => setWeight(Number(e.target.value))}
                 />
             </Grid>
+
             <Grid item xs>
-                <IconButton
-                    color="inherit"
-                    onClick={props.deleteRef(props.exerciseInputRef)}
-                >
-                    <Delete />
-                </IconButton>
+                {props.index !== 0 ? (
+                    <IconButton
+                        color="inherit"
+                        onClick={() => props.handleRemoveClick(props.index)}
+                    >
+                        <Delete />
+                    </IconButton>
+                ) : (
+                    ""
+                )}
+                {props.displayAdd ? (
+                    <IconButton color="inherit" onClick={props.handleAddClick}>
+                        <Add />
+                    </IconButton>
+                ) : (
+                    ""
+                )}
             </Grid>
         </Grid>
     );
