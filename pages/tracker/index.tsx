@@ -6,6 +6,7 @@ import Typography from "@material-ui/core/Typography";
 import { GetServerSideProps } from "next";
 import withSession from "../../lib/session";
 
+import { convertDateToString } from "../../lib/formatDate";
 import { findWorkout } from "../../lib/queries";
 import { GetServerSidePropsContextWithSession } from "../../types";
 
@@ -14,6 +15,7 @@ import { GetServerSidePropsContextWithSession } from "../../types";
 
 export default function Tracker({ workout }: any) {
     // const classes = useStyles();
+    console.log("Workout: ", workout);
     return (
         <>
             <Head>
@@ -23,8 +25,6 @@ export default function Tracker({ workout }: any) {
                 <Typography component="h1" variant="h5">
                     Tracker
                 </Typography>
-
-                {JSON.stringify(workout)}
             </Container>
         </>
     );
@@ -41,14 +41,12 @@ export const getServerSideProps: GetServerSideProps = withSession(
         }
         //TODO:  req.query = {d: "12/21/21"}
         try {
-            const date = new Date()
-            console.log("Date: ", date);
+            const date = convertDateToString(new Date());
             const workout = await findWorkout({
                 userId: user,
                 date: date,
             });
-            console.log("Workout: ", workout);
-            return { props: { workout } };
+            return { props: JSON.stringify(workout) };
         } catch (error) {
             console.error("Server Side Day Error: ", error);
             return { props: { workout: {} } };

@@ -8,12 +8,13 @@ import {
     KeyboardDatePicker,
     MuiPickersUtilsProvider,
 } from "@material-ui/pickers";
+import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date";
 
+import { convertDateToString } from "../../lib/formatDate";
 import fetcher from "../../lib/fetcher";
 import ExerciseInput from "../../components/forms/ExerciseInput";
 import useUser from "../../lib/hooks/useUser";
 import { ExerciseObject } from "../../types";
-import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -40,19 +41,22 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function NewWorkout() {
     const classes = useStyles();
-    const { user } = useUser({
+    const {} = useUser({
         redirectTo: "/login",
         redirectIfFound: false,
     });
-    const [date, setDate] = useState<Date>(new Date());
+    const [chosenDate, setChosenDate] = useState<Date | MaterialUiPickersDate>(
+        new Date()
+    );
 
-    const [exercises, setExercises] = useState<Array<ExerciseObject>>([
+    const [exercises, setExercises] = useState<ExerciseObject[]>([
         { name: "", reps: 0, weight: 0 },
     ]);
 
     const submitNewWorkout = async (e: React.SyntheticEvent) => {
         e.preventDefault();
         try {
+            const date = convertDateToString(chosenDate);
             await fetcher("/api/workout/new", {
                 method: "POST",
                 headers: {
@@ -93,12 +97,9 @@ export default function NewWorkout() {
                 <form onSubmit={submitNewWorkout} className={classes.form}>
                     <MuiPickersUtilsProvider utils={DateFnsUtils}>
                         <KeyboardDatePicker
-                            value={date}
+                            value={chosenDate}
                             minDate={new Date()}
-                            onChange={(newDate) =>
-                                setDate(new Date(newDate) || new Date())
-                            }
-                            format="dd/MM/yyyy"
+                            onChange={(newDate) => setChosenDate(newDate)}
                         />
                     </MuiPickersUtilsProvider>
                     {exercises.map((x, i) => {
@@ -130,6 +131,3 @@ export default function NewWorkout() {
         </Container>
     );
 }
-
-//TODO: Fix they prisma query. Why does it fail on the workout Date
-// TODO: Querying the tracker - workout does not return the exercise

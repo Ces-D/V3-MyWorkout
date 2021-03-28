@@ -35,7 +35,7 @@ export type SearchUserQueryParams = {
     userName?: string;
 };
 
-export type FindWorkoutParams = {
+export type FindWorkoutQueryParams = {
     userId: number;
-    date: Date;
+    date: string;
 };

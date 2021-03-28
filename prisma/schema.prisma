@@ -27,20 +27,20 @@ model Program {
   id           Int            @id @default(autoincrement())
   name         String
   published    Boolean        @default(false)
-  startDate    DateTime       @map(name: "start_date") // Date the user starts the program
-  writer       User           @relation(fields: [writerId], references: [id])
+  startDate    String       @map(name: "start_date") // Date the user starts the program
+  Writer       User           @relation(fields: [writerId], references: [id])
   writerId     Int
-  workout      Workout[] // Maps Program to the workouts that make it up
+  Workout      Workout[] // Maps Program to the workouts that make it up
   Subscription Subscription[] // Maps Users, program activity, and program
 }
 
 model Workout {
   id           Int        @id @default(autoincrement())
   done         Boolean    @default(false)
-  program      Program?   @relation(fields: [programId], references: [id])
+  Program      Program?   @relation(fields: [programId], references: [id])
   programId    Int? // Optional: if the workout belongs to a program
   programOrder Int?       @map(name: "program_order") // If part of Program, where does this workout place 
-  writer       User?      @relation(fields: [writerId], references: [id])
+  Writer       User?      @relation(fields: [writerId], references: [id])
   writerId     Int? // Optional: if the workout does NOT belong to a program
   Tracker      Tracker[] // Maps Users, workout date, and the due date
   Exercise     Exercise[] // Maps Workout to the exercises that make it up
@@ -51,24 +51,24 @@ model Exercise {
   name      String
   reps      Int
   weight    Int
-  workout   Workout @relation(fields: [workoutId], references: [id])
+  Workout   Workout @relation(fields: [workoutId], references: [id])
   workoutId Int
 }
 
 model Subscription {
   id           Int     @id @default(autoincrement())
   active       Boolean @default(false)
-  program      Program @relation(fields: [programId], references: [id])
+  Program      Program @relation(fields: [programId], references: [id])
   programId    Int
-  subscriber   User    @relation(fields: [subscriberId], references: [id])
+  Subscriber   User    @relation(fields: [subscriberId], references: [id])
   subscriberId Int
 }
 
 model Tracker {
-  id        Int      @id @default(autoincrement())
-  user      User     @relation(fields: [userId], references: [id])
+  id        Int     @id @default(autoincrement())
+  User      User    @relation(fields: [userId], references: [id])
   userId    Int
-  dueDate   DateTime @default(now()) @map(name: "due_date")
-  workout   Workout  @relation(fields: [workoutId], references: [id])
+  dueDate   String  @map(name: "due_date")
+  Workout   Workout @relation(fields: [workoutId], references: [id])
   workoutId Int
 }

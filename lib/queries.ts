@@ -1,6 +1,6 @@
 import {
     ExerciseObject,
-    FindWorkoutParams,
+    FindWorkoutQueryParams,
     SearchUserQueryParams,
 } from "../types";
 import prisma from "./db";
@@ -8,18 +8,19 @@ import prisma from "./db";
 /**
  * Create new workout in db if it is not going to be a part of a program
  * @param userId the session users Id
- * @param date date the workout is meant to be held
+ * @param date dateString the workout is meant to be held
  * @param exercises an array containing the various exercises (name, reps, weight)
  * @returns new workout instance
  */
 export const createNewWorkout = async (
     userId: number,
     date: Date,
-    exercises: Array<ExerciseObject>
+    exercises: ExerciseObject[]
 ) => {
     try {
         const newWorkout = await prisma.workout.create({
             data: {
+                writerId: userId,
                 Exercise: {
                     create: [...exercises],
                 },
@@ -30,7 +31,12 @@ export const createNewWorkout = async (
                     },
                 },
             },
+            include: {
+                Tracker: true,
+                Exercise: true,
+            },
         });
+        console.log(newWorkout);
         return newWorkout;
     } catch (error) {
         console.error("New Workout Query Error: ", error);
@@ -108,20 +114,33 @@ export const findUser = async (params: SearchUserQueryParams) => {
  * @param params Object containing due date and user id
  * @returns the workout instance
  */
-export const findWorkout = async (params: FindWorkoutParams) => {
+export const findWorkout = async (params: FindWorkoutQueryParams) => {
+    console.log(params.date);
     try {
         const workout = await prisma.tracker.findFirst({
             where: {
                 userId: params.userId,
-                dueDate: params.date,
+
+                dueDate: "2021-03-27T20:59:29.528Z",
             },
             include: {
-                workout: true,
+                Workout: true,
+                // Workout: {
+                //     include: {
+                //         // Exercise: true,
+                //     },
+                // },
             },
         });
+        console.log(workout);
         return workout;
     } catch (error) {
         console.error("Find Workout Query Error: ", error);
         throw new Error(error);
     }
 };
+
+//TODO: convert the params into actual values
+/**
+ * TEST the endpoints
+ */
