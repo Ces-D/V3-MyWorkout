@@ -3,7 +3,7 @@ import Accordion from "@material-ui/core/Accordion";
 import AccordionSummary from "@material-ui/core/AccordionSummary";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
-import { ExerciseBoxProps } from "../../types";
+import { ExerciseBoxProps } from "../../../types";
 
 export default function ExerciseAccordion(props: ExerciseBoxProps) {
     return (

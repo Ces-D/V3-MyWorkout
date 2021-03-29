@@ -6,7 +6,7 @@ import IconButton from "@material-ui/core/IconButton";
 import Delete from "@material-ui/icons/Delete";
 import Add from "@material-ui/icons/Add";
 
-import { ExerciseInputProps } from "../../types";
+import { ExerciseInputProps } from "../../../types";
 
 export default function ExerciseInput({
     index,

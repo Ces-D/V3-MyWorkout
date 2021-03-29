@@ -2,7 +2,7 @@ import { NextApiResponse } from "next";
 
 import withSession from "../../../lib/session";
 import { createNewWorkout } from "../../../lib/queries";
-import { NextApiRequestWithSession } from "../../../types";
+import { NextApiRequestWithSession } from "../../../../types";
 
 /**
  * Called for independent Workouts aka Workouts not part of Programs

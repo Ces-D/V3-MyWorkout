@@ -2,7 +2,7 @@ import { NextApiResponse } from "next";
 
 import { findUser } from "../../../lib/queries";
 import withSession from "../../../lib/session";
-import { NextApiRequestWithSession } from "../../../types";
+import { NextApiRequestWithSession } from "../../../../types";
 
 export default withSession(
     async (req: NextApiRequestWithSession, res: NextApiResponse) => {

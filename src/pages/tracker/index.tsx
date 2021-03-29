@@ -9,8 +9,8 @@ import withSession from "../../lib/session";
 import ExerciseAccordion from "../../components/tracker/ExerciseAccordion";
 import { convertDateToString } from "../../lib/formatDate";
 import { findWorkout } from "../../lib/queries";
-import { GetServerSidePropsContextWithSession } from "../../types";
-import { TrackerModel } from "../../types/models";
+import { GetServerSidePropsContextWithSession } from "../../../types";
+import { TrackerModel } from "../../../types/models";
 
 // Route: /tracker || /tracker?d=Date
 // const classes = makeStyles((theme: Theme) => createStyles({}));

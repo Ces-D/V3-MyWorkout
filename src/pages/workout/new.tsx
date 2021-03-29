@@ -13,7 +13,7 @@ import { convertDateToString } from "../../lib/formatDate";
 import fetcher from "../../lib/fetcher";
 import ExerciseInput from "../../components/forms/ExerciseInput";
 import useUser from "../../lib/hooks/useUser";
-import { ExerciseObject } from "../../types";
+import { ExerciseObject } from "../../../types";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
