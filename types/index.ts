@@ -1,5 +1,4 @@
 import { Session } from "next-iron-session";
-
 import { NextApiRequest, GetServerSidePropsContext } from "next";
 import { IncomingMessage } from "node:http";
 import { NextApiRequestCookies } from "next/dist/next-server/server/api-utils";
@@ -16,17 +15,28 @@ export interface GetServerSidePropsContextWithSession
 }
 export type ExerciseInputProps = {
     index: number;
-    nameInt: string;
-    repsInt: number;
-    weightInt: number;
+    nameInit: string;
+    repsInit: number;
+    setsInit: number;
+    weightInit: number;
     handleInputChange: any;
     handleRemoveClick: any;
     handleAddClick: any;
     displayAdd: Boolean;
 };
+
+export type ExerciseBoxProps = {
+    id: number;
+    name: string;
+    reps: number;
+    sets: number;
+    weight: number;
+};
+
 export type ExerciseObject = {
     name: string;
     reps: number;
+    sets: number;
     weight: number;
 };
 

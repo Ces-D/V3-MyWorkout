@@ -27,7 +27,7 @@ model Program {
   id           Int            @id @default(autoincrement())
   name         String
   published    Boolean        @default(false)
-  startDate    String       @map(name: "start_date") // Date the user starts the program
+  startDate    String         @map(name: "start_date") // Date the user starts the program
   Writer       User           @relation(fields: [writerId], references: [id])
   writerId     Int
   Workout      Workout[] // Maps Program to the workouts that make it up
@@ -50,6 +50,7 @@ model Exercise {
   id        Int     @id @default(autoincrement())
   name      String
   reps      Int
+  sets      Int
   weight    Int
   Workout   Workout @relation(fields: [workoutId], references: [id])
   workoutId Int

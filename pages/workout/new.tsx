@@ -8,7 +8,6 @@ import {
     KeyboardDatePicker,
     MuiPickersUtilsProvider,
 } from "@material-ui/pickers";
-import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date";
 
 import { convertDateToString } from "../../lib/formatDate";
 import fetcher from "../../lib/fetcher";
@@ -45,12 +44,10 @@ export default function NewWorkout() {
         redirectTo: "/login",
         redirectIfFound: false,
     });
-    const [chosenDate, setChosenDate] = useState<Date | MaterialUiPickersDate>(
-        new Date()
-    );
+    const [chosenDate, setChosenDate] = useState(new Date());
 
     const [exercises, setExercises] = useState<ExerciseObject[]>([
-        { name: "", reps: 0, weight: 0 },
+        { name: "", reps: 0, sets: 0, weight: 0 },
     ]);
 
     const submitNewWorkout = async (e: React.SyntheticEvent) => {
@@ -85,11 +82,11 @@ export default function NewWorkout() {
     };
 
     const handleAddClick = () => {
-        setExercises([...exercises, { name: "", reps: 0, weight: 0 }]);
+        setExercises([...exercises, { name: "", reps: 0, sets: 0, weight: 0 }]);
     };
 
     return (
-        <Container component="main" maxWidth="sm">
+        <Container component="main" maxWidth="md">
             <div className={classes.page}>
                 <Typography component="h1" variant="h5">
                     Create New Workout
@@ -107,9 +104,10 @@ export default function NewWorkout() {
                             <ExerciseInput
                                 key={i}
                                 index={i}
-                                nameInt={x.name}
-                                repsInt={x.reps}
-                                weightInt={x.weight}
+                                nameInit={x.name}
+                                repsInit={x.reps}
+                                setsInit={x.sets}
+                                weightInit={x.weight}
                                 handleInputChange={handleInputChange}
                                 handleRemoveClick={handleRemoveClick}
                                 handleAddClick={handleAddClick}

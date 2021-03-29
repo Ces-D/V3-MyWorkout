@@ -6,16 +6,17 @@ import Typography from "@material-ui/core/Typography";
 import { GetServerSideProps } from "next";
 import withSession from "../../lib/session";
 
+import ExerciseAccordion from "../../components/tracker/ExerciseAccordion";
 import { convertDateToString } from "../../lib/formatDate";
 import { findWorkout } from "../../lib/queries";
 import { GetServerSidePropsContextWithSession } from "../../types";
+import { TrackerModel } from "../../types/models";
 
 // Route: /tracker || /tracker?d=Date
 // const classes = makeStyles((theme: Theme) => createStyles({}));
 
-export default function Tracker({ workout }: any) {
-    // const classes = useStyles();
-    console.log("Workout: ", workout);
+export default function Tracker(props: TrackerModel) {
+    const Exercises = props.Workout.Exercise;
     return (
         <>
             <Head>
@@ -25,6 +26,16 @@ export default function Tracker({ workout }: any) {
                 <Typography component="h1" variant="h5">
                     Tracker
                 </Typography>
+                {Exercises.map((exercise) => {
+                    <ExerciseAccordion
+                        key={exercise.id}
+                        id={exercise.id}
+                        name={exercise.name}
+                        reps={exercise.reps}
+                        sets={exercise.sets}
+                        weight={exercise.weight}
+                    />;
+                })}
             </Container>
         </>
     );
@@ -46,10 +57,14 @@ export const getServerSideProps: GetServerSideProps = withSession(
                 userId: user,
                 date: date,
             });
-            return { props: JSON.stringify(workout) };
+            return { props: { workout } };
         } catch (error) {
             console.error("Server Side Day Error: ", error);
             return { props: { workout: {} } };
         }
     }
 );
+
+//TODO: Add links to create a new workout
+
+//FIXME: Find out how to compartmentalize long components

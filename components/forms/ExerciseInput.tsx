@@ -8,13 +8,24 @@ import Add from "@material-ui/icons/Add";
 
 import { ExerciseInputProps } from "../../types";
 
-export default function ExerciseInput(props: ExerciseInputProps) {
-    const [name, setName] = useState<string>(props.nameInt);
-    const [reps, setReps] = useState<number>(props.repsInt);
-    const [weight, setWeight] = useState<number>(props.weightInt);
+export default function ExerciseInput({
+    index,
+    nameInit,
+    repsInit,
+    setsInit,
+    weightInit,
+    handleInputChange,
+    handleRemoveClick,
+    handleAddClick,
+    displayAdd,
+}: ExerciseInputProps) {
+    const [name, setName] = useState<string>(nameInit);
+    const [reps, setReps] = useState<number>(repsInit);
+    const [sets, setSets] = useState<number>(setsInit);
+    const [weight, setWeight] = useState<number>(weightInit);
 
     useEffect(() => {
-        props.handleInputChange({ name, reps, weight }, props.index);
+        handleInputChange({ name, reps, sets, weight }, index);
     }, [name, reps, weight]);
 
     return (
@@ -48,6 +59,18 @@ export default function ExerciseInput(props: ExerciseInputProps) {
                     margin="normal"
                     required
                     fullWidth
+                    label="Sets"
+                    type="number"
+                    autoFocus
+                    onChange={(e) => setSets(Number(e.target.value))}
+                />
+            </Grid>
+            <Grid item xs>
+                <TextField
+                    variant="outlined"
+                    margin="normal"
+                    required
+                    fullWidth
                     label="Weight (lbs)"
                     type="number"
                     autoFocus
@@ -56,18 +79,18 @@ export default function ExerciseInput(props: ExerciseInputProps) {
             </Grid>
 
             <Grid item xs>
-                {props.index !== 0 ? (
+                {index !== 0 ? (
                     <IconButton
                         color="inherit"
-                        onClick={() => props.handleRemoveClick(props.index)}
+                        onClick={() => handleRemoveClick(index)}
                     >
                         <Delete />
                     </IconButton>
                 ) : (
                     ""
                 )}
-                {props.displayAdd ? (
-                    <IconButton color="inherit" onClick={props.handleAddClick}>
+                {displayAdd ? (
+                    <IconButton color="inherit" onClick={handleAddClick}>
                         <Add />
                     </IconButton>
                 ) : (

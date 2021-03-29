@@ -14,7 +14,7 @@ import prisma from "./db";
  */
 export const createNewWorkout = async (
     userId: number,
-    date: Date,
+    date: string,
     exercises: ExerciseObject[]
 ) => {
     try {
@@ -75,30 +75,30 @@ export const registerNewUser = async (
 };
 
 /**
- * Find user from db
- * @param params Object containing either user id or username
- * @returns the user instance
+ *
+ * @param param0
+ * @returns
  */
-export const findUser = async (params: SearchUserQueryParams) => {
+export const findUser = async ({ id, userName }: SearchUserQueryParams) => {
     try {
         let user = undefined;
 
-        if (params.id && params.userName) {
+        if (id && userName) {
             throw new Error("Only one search param allowed");
-        } else if (!params.id && !params.userName) {
+        } else if (!id && !userName) {
             throw new Error("One search param required");
         }
 
-        if (params.id) {
+        if (id) {
             user = await prisma.user.findUnique({
                 where: {
-                    id: params.id,
+                    id: id,
                 },
             });
         } else {
             user = await prisma.user.findUnique({
                 where: {
-                    userName: params.userName,
+                    userName: userName,
                 },
             });
         }
@@ -114,22 +114,20 @@ export const findUser = async (params: SearchUserQueryParams) => {
  * @param params Object containing due date and user id
  * @returns the workout instance
  */
-export const findWorkout = async (params: FindWorkoutQueryParams) => {
-    console.log(params.date);
+export const findWorkout = async ({ userId, date }: FindWorkoutQueryParams) => {
     try {
         const workout = await prisma.tracker.findFirst({
             where: {
-                userId: params.userId,
+                userId: userId,
 
-                dueDate: "2021-03-27T20:59:29.528Z",
+                dueDate: date,
             },
             include: {
-                Workout: true,
-                // Workout: {
-                //     include: {
-                //         // Exercise: true,
-                //     },
-                // },
+                Workout: {
+                    include: {
+                        Exercise: true,
+                    },
+                },
             },
         });
         console.log(workout);
@@ -139,8 +137,3 @@ export const findWorkout = async (params: FindWorkoutQueryParams) => {
         throw new Error(error);
     }
 };
-
-//TODO: convert the params into actual values
-/**
- * TEST the endpoints
- */
