@@ -1,14 +1,16 @@
 import React from "react";
-import Link from "next/link";
+import { useRouter } from "next/router";
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Typography from "@material-ui/core/Typography";
-import IconButton from "@material-ui/core/IconButton";
-import Assignment from "@material-ui/icons/Assignment";
+// import Assignment from "@material-ui/icons/Assignment";
+import Create from "@material-ui/icons/Create";
 import Toolbar from "@material-ui/core/Toolbar";
+import AccountCircle from "@material-ui/icons/AccountCircle";
 
-import UserIconButton from "./UserIconButton";
+import fetcher from "../lib/fetcher";
 import useUser from "../lib/hooks/useUser";
+import PopMenu from "./actions/PopMenu";
 // TODO: place the icons on the right of bar
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -18,7 +20,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         title: {
             display: "none",
-            [theme.breakpoints.up("sm")]: {
+            [theme.breakpoints.up("xs")]: {
                 display: "block",
             },
         },
@@ -31,7 +33,53 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function Header() {
     const classes = useStyles();
-    const { user } = useUser({ redirectTo: undefined, redirectIfFound: false });
+    const { user, mutateUser } = useUser({
+        redirectTo: undefined,
+        redirectIfFound: false,
+    });
+
+    const router = useRouter();
+
+    const handleLogout = async (e: React.SyntheticEvent) => {
+        e.preventDefault();
+        mutateUser(await fetcher("/api/user/logout", { method: "POST" }));
+        router.push("/login");
+    };
+
+    const loggedInUserPopMenu = {
+        icon: <AccountCircle />,
+        values: [
+            {
+                key: 1,
+                link: "#profile",
+                text: "Profile",
+                condition: undefined,
+            },
+            {
+                key: 2,
+                link: "/api/user/logout",
+                text: "Logout",
+                condition: handleLogout,
+            },
+        ],
+    };
+
+    const loggedOutUserPopMenu = {
+        icon: <AccountCircle />,
+        values: [
+            { key: 1, link: "/login", text: "Login" },
+            { key: 2, link: "/register", text: "Register" },
+        ],
+    };
+
+    const createPopMenu = {
+        icon: <Create />,
+        values: [
+            { key: 1, link: "/workout/new", text: "New Workout" },
+            { key: 2, link: "#program/new", text: "New Program" },
+        ],
+    };
+
     return (
         <div className={classes.grow}>
             <AppBar position="static">
@@ -39,18 +87,25 @@ export default function Header() {
                     <Typography className={classes.title} variant="h6">
                         Workout Tracker
                     </Typography>
-                    {/* <div className={classes.grow}> */}
-                    <div className={classes.section}>
-                        {user?.isLoggedIn && (
-                            <IconButton color="inherit">
-                                <Link href="/tracker">
-                                    <Assignment />
-                                </Link>
-                            </IconButton>
+                    <div className={classes.grow}>
+                        {user?.isLoggedIn ? (
+                            <div>
+                                <PopMenu
+                                    icon={createPopMenu.icon}
+                                    values={createPopMenu.values}
+                                />
+                                <PopMenu
+                                    icon={loggedInUserPopMenu.icon}
+                                    values={loggedInUserPopMenu.values}
+                                />
+                            </div>
+                        ) : (
+                            <PopMenu
+                                icon={loggedOutUserPopMenu.icon}
+                                values={loggedOutUserPopMenu.values}
+                            />
                         )}
-                        <UserIconButton />
                     </div>
-                    {/* </div> */}
                 </Toolbar>
             </AppBar>
         </div>

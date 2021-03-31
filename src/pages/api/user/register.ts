@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import { NextApiResponse } from "next";
 
-import { registerNewUser, findUser } from "../../../lib/queries";
+import { registerNewUser, findUser } from "../../../prisma/queries";
 import withSession from "../../../lib/session";
 import { NextApiRequestWithSession } from "../../../../types";
 

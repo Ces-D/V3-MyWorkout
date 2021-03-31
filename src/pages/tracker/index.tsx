@@ -2,21 +2,24 @@ import React from "react";
 import Head from "next/head";
 import Container from "@material-ui/core/Container";
 import Typography from "@material-ui/core/Typography";
-// import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import { GetServerSideProps } from "next";
-import withSession from "../../lib/session";
 
-import ExerciseAccordion from "../../components/tracker/ExerciseAccordion";
+import withSession from "../../lib/session";
+import ExerciseMap from "../../components/tracker/ExerciseMap";
 import { convertDateToString } from "../../lib/formatDate";
-import { findWorkout } from "../../lib/queries";
+import { findWorkout } from "../../prisma/queries";
 import { GetServerSidePropsContextWithSession } from "../../../types";
 import { TrackerModel } from "../../../types/models";
 
-// Route: /tracker || /tracker?d=Date
-// const classes = makeStyles((theme: Theme) => createStyles({}));
+interface TrackerProps {
+    workout: TrackerModel;
+}
 
-export default function Tracker(props: TrackerModel) {
-    const Exercises = props.Workout.Exercise;
+export default function Tracker({ workout }: TrackerProps) {
+    const Exercises = workout?.Workout.Exercise
+        ? workout.Workout.Exercise
+        : false;
+        console.log("Exercises: ", Exercises)
     return (
         <>
             <Head>
@@ -24,18 +27,12 @@ export default function Tracker(props: TrackerModel) {
             </Head>
             <Container component="main" maxWidth="lg">
                 <Typography component="h1" variant="h5">
-                    Tracker
+                    Tracker: {workout.dueDate}
                 </Typography>
-                {Exercises.map((exercise) => {
-                    <ExerciseAccordion
-                        key={exercise.id}
-                        id={exercise.id}
-                        name={exercise.name}
-                        reps={exercise.reps}
-                        sets={exercise.sets}
-                        weight={exercise.weight}
-                    />;
-                })}
+                <div>
+                {Exercises && <ExerciseMap exercises={Exercises} />}
+
+                </div>
             </Container>
         </>
     );
@@ -57,7 +54,8 @@ export const getServerSideProps: GetServerSideProps = withSession(
                 userId: user,
                 date: date,
             });
-            return { props: { workout } };
+
+            return { props: { workout: workout } };
         } catch (error) {
             console.error("Server Side Day Error: ", error);
             return { props: { workout: {} } };

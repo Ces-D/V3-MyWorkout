@@ -25,14 +25,6 @@ export type ExerciseInputProps = {
     displayAdd: Boolean;
 };
 
-export type ExerciseBoxProps = {
-    id: number;
-    name: string;
-    reps: number;
-    sets: number;
-    weight: number;
-};
-
 export type ExerciseObject = {
     name: string;
     reps: number;

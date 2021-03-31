@@ -51,13 +51,13 @@ export interface ProgramModel extends Program {
     id: number;
     Writer: UserModel[];
     Workout: WorkoutModel[];
-    Subscription: SubscriptionModel[];
+    Subscription?: SubscriptionModel[];
 }
 
 export interface WorkoutModel extends Workout {
     id: number;
-    Program?: ProgramModel;
-    Writer?: UserModel;
+    Program: ProgramModel;
+    Writer: UserModel;
     Tracker: TrackerModel[];
     Exercise: ExerciseModel[];
 }

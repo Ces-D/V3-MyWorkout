@@ -1,6 +1,6 @@
 import { NextApiResponse } from "next";
 
-import { findUser } from "../../../lib/queries";
+import { findUser } from "../../../prisma/queries";
 import withSession from "../../../lib/session";
 import { NextApiRequestWithSession } from "../../../../types";
 

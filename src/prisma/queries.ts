@@ -2,7 +2,7 @@ import {
     ExerciseObject,
     FindWorkoutQueryParams,
     SearchUserQueryParams,
-} from "../types";
+} from "../../types";
 import prisma from "./db";
 
 /**
@@ -130,7 +130,7 @@ export const findWorkout = async ({ userId, date }: FindWorkoutQueryParams) => {
                 },
             },
         });
-        console.log(workout);
+        // console.log("Find Workout Response: ", workout);
         return workout;
     } catch (error) {
         console.error("Find Workout Query Error: ", error);

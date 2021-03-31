@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import {useRouter} from "next/router"
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Typography from "@material-ui/core/Typography";
@@ -44,6 +45,7 @@ export default function NewWorkout() {
         redirectTo: "/login",
         redirectIfFound: false,
     });
+    const router = useRouter()
     const [chosenDate, setChosenDate] = useState(new Date());
 
     const [exercises, setExercises] = useState<ExerciseObject[]>([
@@ -61,6 +63,7 @@ export default function NewWorkout() {
                 },
                 body: JSON.stringify({ date, exercises }),
             });
+            router.push("/tracker")
         } catch (error) {
             console.error("Submit New Workout Error: ", error);
         }
