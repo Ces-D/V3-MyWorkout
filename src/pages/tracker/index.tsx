@@ -5,9 +5,9 @@ import Typography from "@material-ui/core/Typography";
 import { GetServerSideProps } from "next";
 
 import withSession from "../../lib/session";
-import ExerciseMap from "../../components/tracker/ExerciseMap";
 import { convertDateToString } from "../../lib/formatDate";
 import { findWorkout } from "../../prisma/queries";
+import WorkoutDisplay from "../../components/tracker/WorkoutDisplay";
 import { GetServerSidePropsContextWithSession } from "../../../types";
 import { TrackerModel } from "../../../types/models";
 
@@ -16,10 +16,19 @@ interface TrackerProps {
 }
 
 export default function Tracker({ workout }: TrackerProps) {
-    const Exercises = workout?.Workout.Exercise
-        ? workout.Workout.Exercise
-        : false;
-        console.log("Exercises: ", Exercises)
+    const workoutFound = (w: TrackerModel): Boolean => {
+        if (w !== null) {
+            return true;
+        }
+        return false;
+    };
+
+    const workoutNotFoundDisplay = (
+        <Typography>
+            No Workout For Today. Would you like to make one
+        </Typography>
+    );
+
     return (
         <>
             <Head>
@@ -27,12 +36,13 @@ export default function Tracker({ workout }: TrackerProps) {
             </Head>
             <Container component="main" maxWidth="lg">
                 <Typography component="h1" variant="h5">
-                    Tracker: {workout.dueDate}
+                    {new Date().toDateString()}
                 </Typography>
-                <div>
-                {Exercises && <ExerciseMap exercises={Exercises} />}
-
-                </div>
+                {workoutFound(workout) ? (
+                    <WorkoutDisplay exercises={workout.Workout.Exercise} />
+                ) : (
+                    workoutNotFoundDisplay
+                )}
             </Container>
         </>
     );
@@ -54,7 +64,6 @@ export const getServerSideProps: GetServerSideProps = withSession(
                 userId: user,
                 date: date,
             });
-
             return { props: { workout: workout } };
         } catch (error) {
             console.error("Server Side Day Error: ", error);
@@ -62,7 +71,3 @@ export const getServerSideProps: GetServerSideProps = withSession(
         }
     }
 );
-
-//TODO: Add links to create a new workout
-
-//FIXME: Find out how to compartmentalize long components

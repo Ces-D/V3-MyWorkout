@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Typography from "@material-ui/core/Typography";
-// import Assignment from "@material-ui/icons/Assignment";
+import Assignment from "@material-ui/icons/Assignment";
 import Create from "@material-ui/icons/Create";
 import Toolbar from "@material-ui/core/Toolbar";
 import AccountCircle from "@material-ui/icons/AccountCircle";
@@ -80,6 +80,11 @@ export default function Header() {
         ],
     };
 
+    const trackerPopMenu = {
+        icon: <Assignment />,
+        values: [{ key: 1, link: "/tracker", text: "Tracker" }],
+    };
+
     return (
         <div className={classes.grow}>
             <AppBar position="static">
@@ -90,6 +95,10 @@ export default function Header() {
                     <div className={classes.grow}>
                         {user?.isLoggedIn ? (
                             <div>
+                                <PopMenu
+                                    icon={trackerPopMenu.icon}
+                                    values={trackerPopMenu.values}
+                                />
                                 <PopMenu
                                     icon={createPopMenu.icon}
                                     values={createPopMenu.values}
